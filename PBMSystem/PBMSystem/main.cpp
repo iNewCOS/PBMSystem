@@ -1,65 +1,6 @@
 #include <iostream>
-#include <cmath>
-
+#include "account.h"
 using namespace std;
-class SavingsAccount{  ///存储账户类
-private:
-	int id;//帐号
-	double balance;//余额
-	double rate;//存款的年利率
-	int lastDate;//上次变更余额的时间
-	double accumulation;//余额按日累加之和
-
-	void record(int date, double amount);
-	double accumulate(int date) const{
-		return accumulation + balance*(date-lastDate);
-	}
-public:
-	SavingsAccount(int date, int id, double rate);
-	int getId(){return id;}
-	double getBalance(){return balance;}
-	double getRate(){return rate;}
-	void deposit(int date, double amount); ///存入现金
-	void withdraw(int date, double amount);///取出现金
-	void settle(int date);///结算利息，每年1月1日调用一次该函数.
-	void show();///显示账户信息
-};
-
-//SavingsAccount类相关成员函数的实现
-SavingsAccount::SavingsAccount(int date, int id, double rate)
-	:id(id),balance(0),rate(rate),lastDate(date),accumulation(0){
-		cout << date << "\t#" << id << "is created" << endl;
-}
-
-void SavingsAccount::record(int date, double amount){
-	accumulation = accumulate(date);
-	lastDate = date;
-	amount = floor(amount*100+0.5)/100;
-	balance += amount;
-	cout << date << "\t#" << id << "\t" << amount << "\t" << balance << endl;
-}
-
-void SavingsAccount::deposit(int date, double amount){
-	record(date, amount);
-}
-
-void SavingsAccount::withdraw(int date, double amount){
-	if(amount>getBalance())
-		cout << "Error:not enough money" << endl;
-	else
-		record(date, -amount);
-}
-
-void SavingsAccount::settle(int date){
-	double interest=accumulate(date)*rate/365;///计算年息
-	if(interest != 0)
-		record(date, interest);
-	accumulation = 0;
-}
-
-void SavingsAccount::show(){
-	cout << "#" << id << "\t Balance: " << balance;
-}
 
 int main(){
 	///建立几个账户
@@ -74,9 +15,10 @@ int main(){
 	///开户后第90天到了银行的计息日，解算所有账户的年息
 	sa0.settle(90); cout << endl;
 	sa1.settle(90); cout << endl;
-	///输出各个账户信息
+
 	sa0.show();  cout << endl;
 	sa1.show();  cout << endl;
+	cout << "Total: " << SavingsAccount::getTotal() << endl;
 	return 0;
 }
 
