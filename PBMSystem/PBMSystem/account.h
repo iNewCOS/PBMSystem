@@ -1,35 +1,66 @@
+//account.h
 #ifndef _ACCOUNT_H_
 #define _ACCOUNT_H_
 
 #include "date.h"
+#include "Accumulator.h"
 #include <string>
 
-class SavingsAccount{  ///存储账户类
+class Account {
 private:
-	std::string id;//帐号
-	double balance;//余额
-	double rate;//存款的年利率
-	Date lastDate;//上次变更余额的时间
-	double accumulation;//余额按日累加之和
-	static double total;//所有账户的总金额
-
-	//记录一笔帐，date为日期，amount为金额
-	void record(const Date &date, double amount, const std::string &desc);
-
+	std::string id;
+	double balance;
+	static double total;
+protected:
+	Account(const Date& date, const std::string &id);
+	void record(const Date& date, double amount, const std::string &desc);
 	void error(const std::string &msg) const;
-	//获得指定日期为止的存款金额按日累计值
-	double accumulate(const Date &date) const{
-		return accumulation + balance*date.distance(lastDate);
-	}
+public:
+	const std::string &getid() const {return id;}
+	double getBalance() const {return balance;}
+	static double getTotal() {return total;}
+	void show() const;
+};
+
+class SavingsAccount:public Account {  ///存储账户类
+private:
+	Accumulator acc;
+	double rate;//存款的年利率
 public:
 	SavingsAccount(const Date &date, const std::string &id, double rate);
-	const std::string &getId()const {return id;}
-	double getBalance()const {return balance;}
 	double getRate()const {return rate;}
-	static double getTotal() {return total;}
-	void deposit (const Date &date, double amount, const std::string &desc);
+	void deposit(const Date &date, double amount, const std::string &desc);
 	void withdraw(const Date &date, double amount, const std::string &desc);///取出现金
 	void settle(const Date &date);///结算利息，每年1月1日调用一次该函数.
-	void show() const; ///显示账户信息
+};
+
+class CreditAccount : public Account { // 信用卡
+private:
+	Accumulator acc;
+	double credit;
+	double rate;
+	double fee;
+	double getDebt() const {
+		double balance = getBalance();
+		return (balance<0? balance : 0);
+	}
+public:
+	CreditAccount(const Date& date, const std::string& id, 
+		double credit, double rate, double fee);
+	double getCredit() const {return credit;}
+	double getRate() const {return rate;}
+	double getFee() const {return fee;}
+	double getAvailableCredit() const {
+		if(getBalance()<0)
+			return credit+getBalance();
+		else
+			return credit;
+	}
+	//存入现金
+	void deposit(const Date& date, double amount, const std::string& desc);
+	//取出现金
+	void withdraw(const Date& date, double amount, const std::string& desc);
+	void settle(const Date& date); //解算利息和年费
+	void show()const;
 };
 #endif //_ACCOUNT_H_
