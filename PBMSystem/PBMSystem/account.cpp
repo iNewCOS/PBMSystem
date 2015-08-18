@@ -51,10 +51,14 @@ void SavingsAccount::withdraw(const Date &date, double amount, const string &des
 }
 
 void SavingsAccount::settle(const Date  &date){  //计算年息
-	double interest=acc.getSum(date)*rate/date.distance(Date(date.getYear()-1, 1, 1));///计算年息
-	if(interest != 0)
-		record(date, interest, "interest");
-	acc.change(date, getBalance());
+	if(date.getMonth() == 1)
+	{
+		double interest = acc.getSum(date)*rate
+			/(date-Date(date.getYear ()-1,1,1));
+		if(interest != 0)
+			record(date, interest, "interest");
+		acc.reset(date, getBalance());
+	}
 }
 
 //CreditAccount 类相关成员函数实现

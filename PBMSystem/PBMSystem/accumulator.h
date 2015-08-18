@@ -13,7 +13,7 @@ public:
 	Accumulator(const Date& date, double value):lastDate(date),value(value),sum(0)
 	{}
 	double getSum(const Date& date) const{
-		return sum+value*date.distance(lastDate);
+		return sum+value*(date-lastDate);
 	}
 	void change(const Date& date, double value) {
 		sum = getSum(date);

@@ -19,7 +19,12 @@ public:
 	const std::string &getid() const {return id;}
 	double getBalance() const {return balance;}
 	static double getTotal() {return total;}
-	void show() const;
+
+	virtual void deposit(const Date& date, double amount, const std::string& desc)=0;
+	//取出现金
+	virtual void withdraw(const Date& date, double amount, const std::string& desc)=0;
+	virtual void settle(const Date& date)=0; //解算利息和年费
+	virtual void show()const;
 };
 
 class SavingsAccount:public Account {  ///存储账户类
